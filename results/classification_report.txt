@@ -1,0 +1,23 @@
+Loaded 85 labeled clauses.
+/usr/local/lib/python3.12/dist-packages/sklearn/model_selection/_split.py:813: UserWarning: The least populated class in y has only 4 members, which is less than n_splits=5.
+  warnings.warn(
+Cross-validated accuracy: 0.56 (+/- 0.03)
+/usr/local/lib/python3.12/dist-packages/sklearn/metrics/_classification.py:1833: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", result.shape[0])
+/usr/local/lib/python3.12/dist-packages/sklearn/metrics/_classification.py:1833: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", result.shape[0])
+/usr/local/lib/python3.12/dist-packages/sklearn/metrics/_classification.py:1833: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", result.shape[0])
+                    precision    recall  f1-score   support
+
+ deceptive_framing       0.80      0.67      0.73         6
+forced_arbitration       1.00      1.00      1.00         1
+        hidden_fee       0.00      0.00      0.00         1
+              none       0.67      0.67      0.67         6
+ penalty_obscurity       0.20      0.33      0.25         3
+
+          accuracy                           0.59        17
+         macro avg       0.53      0.53      0.53        17
+      weighted avg       0.61      0.59      0.59        17
+
+Saved model to /home/claude/fintech-dark-patterns/data/labeled/classifier.pkl
