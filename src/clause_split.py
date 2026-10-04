@@ -40,14 +40,20 @@ def _merge_false_splits(parts: list[str]) -> list[str]:
 
 
 def split_into_clauses(text: str) -> list[str]:
-    """Split text into clause-level chunks (roughly one sentence/bullet each)."""
-    # Split on newlines first (T&C docs are often already bullet/line separated)
+    """Split text into clause-level chunks (roughly one sentence/bullet each).
+
+    Only splits on '.'/';' when followed by whitespace + a capital letter.
+    This is the key fix: a semicolon-separated list like "breach of T&C;
+    due to internal policies;" previously got shredded into fragments
+    because each list item was treated as its own sentence — list items
+    continue in lowercase, so requiring a capital letter after the split
+    point keeps them together. Numbers/abbreviations are additionally
+    repaired by _merge_false_splits as a second pass.
+    """
     lines = [l.strip() for l in text.split("\n") if l.strip()]
     clauses = []
     for line in lines:
-        # Further split long lines into sentences, then repair false splits
-        # caused by abbreviations (e.g. "Rs.") or numbers (e.g. "Rs. 1,000").
-        raw_sentences = re.split(r"(?<=[.;])\s+", line)
+        raw_sentences = re.split(r"(?<=[.;])\s+(?=[A-Z])", line)
         sentences = _merge_false_splits(raw_sentences)
         for s in sentences:
             s = s.strip()
