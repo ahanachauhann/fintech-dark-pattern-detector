@@ -2,3 +2,5 @@ scikit-learn>=1.3
 pandas>=2.0
 streamlit>=1.30
 anthropic>=0.25
+transformers>=4.30
+torch>=2.0
