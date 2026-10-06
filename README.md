@@ -22,24 +22,6 @@ fintech-dark-patterns/
 └── requirements.txt
 ```
 
-## Week-by-week plan this scaffold supports
-
-**Week 1 — Data.** Drop raw T&C text files into `data/raw/` (one .txt file
-per product — see `data/raw/README.md` for real sources already found).
-Run `src/clause_split.py` to break them into clause-level rows.
-
-**Week 2 — Labels.** Review `src/categories.py` and adjust the categories
-if you want. Run `src/label_with_llm.py` to get first-pass labels, then
-open the resulting CSV and manually correct a sample yourself — this
-manual review step matters for your report's credibility.
-
-**Week 3 — Classifier.** Run `src/train_classifier.py` on your labeled
-CSV. It starts with TF-IDF + Logistic Regression (fast, easy to explain
-in your defense). Upgrade to a fine-tuned transformer later only if time
-allows.
-
-**Week 4 — Demo.** Run the Streamlit app (`streamlit run app/streamlit_app.py`)
-to paste in T&C text and see flagged clauses + a Fairness Score.
 
 ## Setup
 
