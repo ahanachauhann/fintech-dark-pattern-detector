@@ -32,27 +32,8 @@ interpretable "Fairness Score" per document.
 6. Implementation
 7. Results
 
-## 2. How we got here (decision history, briefly)
 
-- Explored and rejected: Kafka emotion-arc analysis (too thin technically),
-  Sign Language Recognition (overdone FYP topic), generic stock predictor
-  (overdone), basic explainable-credit-risk model (too textbook)
-- Landed on the dark-pattern detector for being technically substantial,
-  timely (RBI drafted dark-pattern banking rules in Feb 2026), and original
-- **Professor's feedback that reshaped the methodology:** reviewed CLAUDETTE
-  (Lippi et al. 2019) and noted Table 3 has no transformer/LLM models (it
-  predates the transformer era — only SVM/CNN/LSTM). Asked for LLM/classifier
-  comparison and a model type not yet tried.
-- **Honest research-gap check:** transformer/LLM approaches to *general* ToS
-  unfairness detection already exist (Legal-BERT, and especially "Text to
-  Trust" — Juttu et al. 2025, arXiv 2510.22531 — which does almost exactly
-  BERT/DistilBERT fine-tuning + LoRA + zero-shot GPT-4o on the CLAUDETTE
-  dataset). **The actual unclaimed gap: nobody has applied these methods to
-  fintech-specific contracts.** That's the real contribution — domain
-  transfer, not a new technique. State this honestly in the report; don't
-  overclaim novelty.
-
-## 3. Key papers to cite
+## 2. Key papers to cite
 
 - **Lippi et al. 2019, "CLAUDETTE"** — direct precedent; ML detection of
   unfair clauses in ToS using pre-transformer methods (80%+ precision)
@@ -66,7 +47,7 @@ interpretable "Fairness Score" per document.
 - **RBI Draft Amendments on Dark Patterns in Banking** (Feb 2026) — current
   regulatory relevance for your introduction
 
-## 4. Current dataset status
+## 3. Current dataset status
 
 **15 real documents, 251 labeled clauses**, covering all 4 categories:
 - BNPL: LazyPay, Amazon Pay Later, ZestMoney, Paytm (fees)
