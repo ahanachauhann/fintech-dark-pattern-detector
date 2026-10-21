@@ -1,0 +1,11 @@
+RUN 2 (final config, fit check passed: train macro-F1 = 1.000)
+distilbert-base-uncased | mode=grouped | 251 clauses | 15 folds | epochs=20 lr=5e-05 batch=8
+accuracy : 0.831 +/- 0.065
+macro-F1 : 0.573 +/- 0.168
+train macro-F1 (fit check, should be high): 1.000
+per-class F1 (mean +/- std over folds where the class appears):
+  deceptive_framing    0.543 +/- 0.262  (n_folds=12)
+  forced_arbitration   0.783 +/- 0.210  (n_folds=10)
+  hidden_fee           0.841 +/- 0.125  (n_folds=14)
+  none                 0.873 +/- 0.064  (n_folds=15)
+  penalty_obscurity    0.375 +/- 0.315  (n_folds=10)
