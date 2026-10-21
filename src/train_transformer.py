@@ -138,7 +138,10 @@ def main():
     preds = trainer.predict(test_ds)
     y_pred = np.argmax(preds.predictions, axis=-1)
     print("\nFull classification report (same test set as TF-IDF baseline):")
-    print(classification_report(y_test, y_pred, target_names=list(ID2LABEL.values()), zero_division=0))
+    print(classification_report(
+        y_test, y_pred, labels=list(ID2LABEL.keys()),
+        target_names=list(ID2LABEL.values()), zero_division=0,
+    ))
 
     MODEL_OUT_DIR.mkdir(parents=True, exist_ok=True)
     model.save_pretrained(MODEL_OUT_DIR)
