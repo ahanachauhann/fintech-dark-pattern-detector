@@ -1,0 +1,11 @@
+RUN 1 (underfit - kept for the record; superseded by run 2)
+distilbert-base-uncased | mode=grouped | 251 clauses | 15 folds | epochs=8 lr=3e-05 | 56 steps/fold (effective batch ~32 on Kaggle dual GPU)
+accuracy : 0.513 +/- 0.090
+macro-F1 : 0.352 +/- 0.078
+per-class F1 (mean +/- std over folds where the class appears):
+  deceptive_framing    0.393 +/- 0.184  (n_folds=12)
+  forced_arbitration   0.595 +/- 0.320  (n_folds=10)
+  hidden_fee           0.534 +/- 0.141  (n_folds=14)
+  none                 0.536 +/- 0.121  (n_folds=15)
+  penalty_obscurity    0.025 +/- 0.075  (n_folds=10)
+Diagnosis: reported train_loss ~1.24-1.38 in every fold (near chance); model did not fit the training data.

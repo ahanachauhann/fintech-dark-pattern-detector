@@ -68,8 +68,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", choices=MODEL_CHOICES, default="distilbert")
     ap.add_argument("--mode", choices=["stratified", "grouped"], default="stratified")
-    ap.add_argument("--epochs", type=int, default=8)
-    ap.add_argument("--lr", type=float, default=3e-5)
+    ap.add_argument("--epochs", type=int, default=20)
+    ap.add_argument("--lr", type=float, default=5e-5)
+    ap.add_argument("--batch-size", type=int, default=8, help="per-device batch size")
+    ap.add_argument("--warmup", type=float, default=0.1, help="fraction of steps used for LR warmup")
     ap.add_argument("--max-folds", type=int, default=None, help="smoke test: only run first N folds")
     args = ap.parse_args()
 
@@ -86,9 +88,10 @@ def main():
     i2l = {i: l for l, i in l2i.items()}
     y = np.array([l2i[r["label"]] for r in rows])
     name = MODEL_CHOICES[args.model]
-    print(f"{name} | mode={args.mode} | {len(rows)} clauses | {len(splits)} folds | device cuda={torch.cuda.is_available()}")
+    n_dev = max(1, torch.cuda.device_count())
+    print(f"{name} | mode={args.mode} | {len(rows)} clauses | {len(splits)} folds | gpus={n_dev} | effective batch={args.batch_size * n_dev}")
 
-    accs, macros = [], []
+    accs, macros, train_f1s = [], [], []
     per_class = defaultdict(list)
     tok = AutoTokenizer.from_pretrained(name)
 
@@ -102,9 +105,10 @@ def main():
 
         model = AutoModelForSequenceClassification.from_pretrained(
             name, num_labels=len(labels_all), id2label=i2l, label2id=l2i)
+        steps = int(np.ceil(len(tr) / (args.batch_size * n_dev))) * args.epochs
         targs = TrainingArguments(
             output_dir=str(ROOT / "tmp_cv"), num_train_epochs=args.epochs,
-            per_device_train_batch_size=16, per_device_eval_batch_size=32,
+            per_device_train_batch_size=args.batch_size, warmup_steps=int(args.warmup * steps), per_device_eval_batch_size=32,
             learning_rate=args.lr, weight_decay=0.01, save_strategy="no",
             logging_strategy="no", report_to=[], seed=42 + k,
             fp16=torch.cuda.is_available(), disable_tqdm=True)
@@ -113,22 +117,25 @@ def main():
         trainer.train()
         pred = np.argmax(trainer.predict(ClauseDataset(te_enc, y[te].tolist())).predictions, axis=-1)
 
+        tr_pred = np.argmax(trainer.predict(ClauseDataset(tr_enc, y[tr].tolist())).predictions, axis=-1)
         idx = list(range(len(labels_all)))
+        train_f1s.append(f1_score(y[tr], tr_pred, labels=idx, average="macro", zero_division=0))
         accs.append(accuracy_score(y[te], pred))
         macros.append(f1_score(y[te], pred, labels=idx, average="macro", zero_division=0))
         f1s = f1_score(y[te], pred, labels=idx, average=None, zero_division=0)
         for i, f in zip(idx, f1s):
             if (y[te] == i).any():
                 per_class[i2l[i]].append(f)
-        print(f"fold {k+1}/{len(splits)}: acc={accs[-1]:.3f} macroF1={macros[-1]:.3f}", flush=True)
+        print(f"fold {k+1}/{len(splits)}: steps={steps} train macroF1={train_f1s[-1]:.3f} | test acc={accs[-1]:.3f} macroF1={macros[-1]:.3f}", flush=True)
 
         del trainer, model
         gc.collect()
         torch.cuda.empty_cache()
 
-    lines = [f"{name} | mode={args.mode} | {len(rows)} clauses | {len(splits)} folds | epochs={args.epochs} lr={args.lr}",
+    lines = [f"{name} | mode={args.mode} | {len(rows)} clauses | {len(splits)} folds | epochs={args.epochs} lr={args.lr} batch={args.batch_size*n_dev}",
              f"accuracy : {np.mean(accs):.3f} +/- {np.std(accs):.3f}",
              f"macro-F1 : {np.mean(macros):.3f} +/- {np.std(macros):.3f}",
+             f"train macro-F1 (fit check, should be high): {np.mean(train_f1s):.3f}",
              "per-class F1 (mean +/- std over folds where the class appears):"]
     for lab in labels_all:
         v = per_class[lab]
@@ -140,7 +147,7 @@ def main():
     out.mkdir(exist_ok=True)
     tag = f"{args.model}_cv_{args.mode}" + (f"_smoke{args.max_folds}" if args.max_folds else "")
     (out / f"{tag}.txt").write_text(report + "\n")
-    json.dump({"accuracy": accs, "macro_f1": macros}, open(out / f"{tag}.json", "w"))
+    json.dump({"accuracy": accs, "macro_f1": macros, "train_macro_f1": train_f1s}, open(out / f"{tag}.json", "w"))
 
 
 if __name__ == "__main__":
