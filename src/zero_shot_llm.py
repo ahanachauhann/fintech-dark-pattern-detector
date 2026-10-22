@@ -32,7 +32,7 @@ import numpy as np
 from sklearn.metrics import accuracy_score, f1_score
 
 from categories import CATEGORIES, CATEGORY_IDS
-from cv_splits import ROOT, SPLITS_PATH, load_rows
+from cv_splits import ROOT, SPLITS_PATH, TAG, load_rows
 
 SYSTEM = (
     "You are an expert analyst of consumer financial contracts. You classify one clause "
@@ -126,7 +126,7 @@ def main():
         with open(pred_path, newline="", encoding="utf-8") as f:
             cache = {int(r["idx"]): r for r in csv.DictReader(f)}
 
-    run = make_backend(args)
+    run = make_backend(args) if any(i not in cache for i in range(n)) else None   # no model load if fully cached
     new = not pred_path.exists()
     with open(pred_path, "a", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=["idx", "true", "pred", "raw"])
@@ -150,7 +150,7 @@ def main():
             print(f"  true={cache[i]['true']:20s} pred={cache[i]['pred']:20s} raw={cache[i]['raw']!r}")
         return
 
-    y = np.array([cache[i]["true"] for i in range(len(rows))])
+    y = np.array([rows[i]["label"] for i in range(len(rows))])   # current label version, not the cached one
     raw_pred = np.array([cache[i]["pred"] for i in range(len(rows))])
     n_unparsed = int((raw_pred == "UNPARSED").sum())
     pred = np.where(raw_pred == "UNPARSED", "none", raw_pred)
@@ -164,7 +164,7 @@ def main():
         for _, te in splits_all[mode]:
             te = np.array(te)
             accs.append(accuracy_score(y[te], pred[te]))
-            macros.append(f1_score(y[te], pred[te], labels=labels, average="macro", zero_division=0))
+            macros.append(f1_score(y[te], pred[te], labels=sorted(set(y[te])), average="macro", zero_division=0))
             for lab, fv in zip(labels, f1_score(y[te], pred[te], labels=labels, average=None, zero_division=0)):
                 if (y[te] == lab).any():
                     per_class[lab].append(fv)
@@ -178,8 +178,8 @@ def main():
             lines.append(f"  {lab:20s} {np.mean(v):.3f} +/- {np.std(v):.3f}  (n_folds={len(v)})")
         report = "\n".join(lines)
         print(report + "\n")
-        (out_dir / f"{args.name}_cv_{mode}.txt").write_text(report + "\n")
-        json.dump({"accuracy": accs, "macro_f1": macros}, open(out_dir / f"{args.name}_cv_{mode}.json", "w"))
+        (out_dir / f"{args.name}_cv_{mode}{TAG}.txt").write_text(report + "\n")
+        json.dump({"accuracy": accs, "macro_f1": macros}, open(out_dir / f"{args.name}_cv_{mode}{TAG}.json", "w"))
 
 
 if __name__ == "__main__":

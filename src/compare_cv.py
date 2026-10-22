@@ -16,13 +16,13 @@ import sys
 import numpy as np
 from scipy import stats
 
-from cv_splits import ROOT
+from cv_splits import ROOT, TAG
 
 TEST_OVER_TRAIN = 0.25  # 5-fold: test = 20%, train = 80%
 
 
 def load(name, mode):
-    return json.load(open(ROOT / "results" / f"{name}_cv_{mode}.json"))
+    return json.load(open(ROOT / "results" / f"{name}_cv_{mode}{TAG}.json"))
 
 
 def main():

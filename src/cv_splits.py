@@ -14,12 +14,16 @@ Two modes:
 """
 import csv
 import json
+import os
 from pathlib import Path
 
 from sklearn.model_selection import RepeatedStratifiedKFold, StratifiedGroupKFold
 
 ROOT = Path(__file__).resolve().parent.parent
-DATA_PATH = ROOT / "data" / "labeled" / "clauses_reviewed.csv"
+# Switch label versions without touching old results:
+#   DP_LABELS=clauses_reviewed_v3.csv DP_TAG=_v3 python ...
+DATA_PATH = ROOT / "data" / "labeled" / os.environ.get("DP_LABELS", "clauses_reviewed.csv")
+TAG = os.environ.get("DP_TAG", "")   # suffix added to result file names
 SPLITS_PATH = ROOT / "results" / "cv_splits.json"
 
 

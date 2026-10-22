@@ -30,7 +30,7 @@ from torch.utils.data import Dataset
 from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
                           Trainer, TrainingArguments, set_seed)
 
-from cv_splits import ROOT, SPLITS_PATH, load_rows
+from cv_splits import ROOT, SPLITS_PATH, TAG, load_rows
 
 MODEL_CHOICES = {
     "distilbert": "distilbert-base-uncased",
@@ -121,7 +121,7 @@ def main():
         idx = list(range(len(labels_all)))
         train_f1s.append(f1_score(y[tr], tr_pred, labels=idx, average="macro", zero_division=0))
         accs.append(accuracy_score(y[te], pred))
-        macros.append(f1_score(y[te], pred, labels=idx, average="macro", zero_division=0))
+        macros.append(f1_score(y[te], pred, labels=sorted(set(y[te])), average="macro", zero_division=0))
         f1s = f1_score(y[te], pred, labels=idx, average=None, zero_division=0)
         for i, f in zip(idx, f1s):
             if (y[te] == i).any():
@@ -145,7 +145,7 @@ def main():
 
     out = ROOT / "results"
     out.mkdir(exist_ok=True)
-    tag = f"{args.model}_cv_{args.mode}" + (f"_smoke{args.max_folds}" if args.max_folds else "")
+    tag = f"{args.model}_cv_{args.mode}{TAG}" + (f"_smoke{args.max_folds}" if args.max_folds else "")
     (out / f"{tag}.txt").write_text(report + "\n")
     json.dump({"accuracy": accs, "macro_f1": macros, "train_macro_f1": train_f1s}, open(out / f"{tag}.json", "w"))
 

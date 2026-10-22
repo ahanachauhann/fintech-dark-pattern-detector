@@ -15,7 +15,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import f1_score, accuracy_score
 
-from cv_splits import ROOT, get_splits, load_rows
+from cv_splits import ROOT, TAG, get_splits, load_rows
 
 
 def main():
@@ -38,7 +38,8 @@ def main():
         clf = LogisticRegression(max_iter=1000, class_weight="balanced").fit(Xtr, y[tr])
         pred = clf.predict(Xte)
         accs.append(accuracy_score(y[te], pred))
-        macros.append(f1_score(y[te], pred, labels=labels, average="macro", zero_division=0))
+        present = sorted(set(y[te]))   # macro-F1 over classes that actually occur in this fold
+        macros.append(f1_score(y[te], pred, labels=present, average="macro", zero_division=0))
         f1s = f1_score(y[te], pred, labels=labels, average=None, zero_division=0)
         for lab, f in zip(labels, f1s):
             if (y[te] == lab).any():          # only score a class on folds where it exists
@@ -56,8 +57,8 @@ def main():
 
     out = ROOT / "results"
     out.mkdir(exist_ok=True)
-    (out / f"tfidf_cv_{args.mode}.txt").write_text(report + "\n")
-    json.dump({"accuracy": accs, "macro_f1": macros}, open(out / f"tfidf_cv_{args.mode}.json", "w"))
+    (out / f"tfidf_cv_{args.mode}{TAG}.txt").write_text(report + "\n")
+    json.dump({"accuracy": accs, "macro_f1": macros}, open(out / f"tfidf_cv_{args.mode}{TAG}.json", "w"))
 
 
 if __name__ == "__main__":

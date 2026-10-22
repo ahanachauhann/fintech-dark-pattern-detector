@@ -1,0 +1,30 @@
+HOW TO REVIEW (about 40 clauses, ~40 minutes)
+
+1. Open review_sheet.csv in Excel/Numbers/Sheets. Do NOT open review_key.csv until you finish.
+2. For each clause, type ONE label in the my_label column, using the definitions below.
+   Use the exact id text (e.g. hidden_fee). Add a short note if you were unsure.
+3. Judge each clause on its own. Do not try to guess what the "right" answer is meant to be.
+
+CORE RULE: a clause is a dark pattern because of HOW it is written (vague, unquantified,
+discretionary, or disclosed only after the fact) - not merely because it mentions money,
+a penalty, or a company right. A clearly quantified fee/penalty is `none`.
+
+hidden_fee          The AMOUNT, RATE or TRIGGER of a charge is not given in the clause itself
+                    ('may be chargeable', 'nominal fee', 'as applicable'), or the fee is only
+                    shown AFTER the transaction. A stated percentage/amount/cap = none.
+penalty_obscurity   A penalty/late-fee/default term whose amount or trigger is not fully
+                    specified ('as may be determined', open-ended escalation, confusing
+                    compounding). A concrete penalty table or stated maximum = none.
+deceptive_framing   The company has a broad, vaguely-bounded power over something
+                    consequential (reject, modify, cancel, suspend) 'at its sole discretion',
+                    'without assigning any reason', 'without notice'.
+forced_arbitration  Real arbitration clauses, 'final and binding' on the consumer, waivers of
+                    the right to dispute, or unusually short mandatory claim windows. A plain
+                    payment demand / legal-action warning / credit-bureau reporting is NOT this.
+none                Neutral clause, clearly quantified fee/penalty/term, standard liability or
+                    insurance disclaimer, or an ordinary consequence of default with nothing vague.
+(auto_renewal_trap is not used: the dataset has no examples.)
+
+If you genuinely cannot decide between two labels, pick the better one and write both in notes.
+
+4. When every row is filled, run:   cd src && python score_review.py
