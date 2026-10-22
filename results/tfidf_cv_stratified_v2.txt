@@ -1,0 +1,9 @@
+TF-IDF + LogReg | mode=stratified | 251 clauses | 15 folds
+accuracy : 0.789 +/- 0.039
+macro-F1 : 0.658 +/- 0.092
+per-class F1 (mean +/- std over folds where the class appears):
+  deceptive_framing    0.509 +/- 0.224  (n_folds=15)
+  forced_arbitration   0.889 +/- 0.263  (n_folds=15)
+  hidden_fee           0.761 +/- 0.076  (n_folds=15)
+  none                 0.846 +/- 0.033  (n_folds=15)
+  penalty_obscurity    0.284 +/- 0.282  (n_folds=15)
