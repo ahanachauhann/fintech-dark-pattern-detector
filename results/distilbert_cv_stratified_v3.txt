@@ -1,0 +1,10 @@
+distilbert-base-uncased | mode=stratified | v3 labels | 251 clauses | 15 folds | epochs=20 lr=5e-05 batch=8
+accuracy : 0.859 +/- 0.045
+macro-F1 : 0.658 +/- 0.073
+train macro-F1 (fit check, should be high): 1.000
+per-class F1 (mean +/- std over folds where the class appears):
+  deceptive_framing    0.815 +/- 0.062  (n_folds=15)
+  forced_arbitration   0.591 +/- 0.398  (n_folds=11)
+  hidden_fee           0.334 +/- 0.304  (n_folds=15)
+  none                 0.910 +/- 0.032  (n_folds=15)
+  penalty_obscurity    0.596 +/- 0.377  (n_folds=8)
