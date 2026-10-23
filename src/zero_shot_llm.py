@@ -41,7 +41,18 @@ SYSTEM = (
 )
 
 
-def build_prompt(clause, with_cues=False):
+GUIDE_V3 = """Categories (decide in this order and stop at the first that fits):
+1. deceptive_framing: the company gives itself broad unilateral power - 'sole discretion', 'without notice or reason', changing terms or services at any time, rejecting, suspending, cancelling or disclosing at will. If the discretion is over a charge, it is still deceptive_framing.
+2. penalty_obscurity: ONLY a late/default money penalty whose amount or trigger is unspecified or escalating. The word 'penalty' alone does not count.
+3. hidden_fee: a fee, charge or interest component whose amount, rate or trigger/threshold is not stated; fees that 'may vary'; charges levied outside the headline rate. A fully stated amount is none.
+4. forced_arbitration: an arbitration clause, a waiver of the right to dispute or sue, or a deemed-acceptance window (e.g. statement deemed correct unless disputed within N days). A bank's own 'final and binding decision' is deceptive_framing, not this.
+5. none: rules that protect or inform the customer (disclosure requirements, notice promises); fully stated terms; plain information; standard 'not liable for events beyond our control'; ordinary default consequences such as credit-bureau reporting or legal action; reward points lapsing."""
+V3_IDS = ["deceptive_framing", "penalty_obscurity", "hidden_fee", "forced_arbitration", "none"]
+
+
+def build_prompt(clause, with_cues=False, prompt_version="v2"):
+    if prompt_version == "v3":
+        return (GUIDE_V3 + f"\n\nClause:\n\"\"\"{clause}\"\"\"\n\nAnswer with exactly one of: {', '.join(V3_IDS)}")
     lines = ["Categories:"]
     for cid in CATEGORY_IDS:
         c = CATEGORIES[cid]
@@ -89,10 +100,14 @@ def make_backend(args):
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer
         tok = AutoTokenizer.from_pretrained(args.model)
+        extra = {}
+        if args.load_in_4bit:
+            from transformers import BitsAndBytesConfig
+            extra["quantization_config"] = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.float16)
         try:
-            model = AutoModelForCausalLM.from_pretrained(args.model, dtype=torch.float16, device_map="auto")
+            model = AutoModelForCausalLM.from_pretrained(args.model, dtype=torch.float16, device_map="auto", **extra)
         except TypeError:
-            model = AutoModelForCausalLM.from_pretrained(args.model, torch_dtype=torch.float16, device_map="auto")
+            model = AutoModelForCausalLM.from_pretrained(args.model, torch_dtype=torch.float16, device_map="auto", **extra)
         model.eval()
 
         def run(system, user):
@@ -112,6 +127,9 @@ def main():
     ap.add_argument("--model", default="")
     ap.add_argument("--name", default="zeroshot", help="method name used in results file names")
     ap.add_argument("--with-cues", action="store_true", help="also show cue phrases (off by default: they mirror the labeling rules)")
+    ap.add_argument("--prompt", choices=["v2", "v3"], default="v2",
+                    help="v2 = original definitions (used in the first run); v3 = refined annotation guideline")
+    ap.add_argument("--load-in-4bit", action="store_true", help="hf backend: 4-bit quantization for larger models (needs bitsandbytes)")
     ap.add_argument("--limit", type=int, default=None, help="smoke test: only first N clauses (skips CV scoring)")
     args = ap.parse_args()
 
@@ -135,7 +153,7 @@ def main():
         for i in range(n):
             if i in cache:
                 continue
-            raw = run(SYSTEM, build_prompt(rows[i]["clause_text"], args.with_cues)).strip()
+            raw = run(SYSTEM, build_prompt(rows[i]["clause_text"], args.with_cues, args.prompt)).strip()
             pred = parse_label(raw)
             rec = {"idx": i, "true": rows[i]["label"], "pred": pred or "UNPARSED", "raw": raw.replace("\n", " ")[:80]}
             w.writerow(rec)
@@ -168,7 +186,7 @@ def main():
             for lab, fv in zip(labels, f1_score(y[te], pred[te], labels=labels, average=None, zero_division=0)):
                 if (y[te] == lab).any():
                     per_class[lab].append(fv)
-        lines = [f"{args.name} ({args.backend} {args.model}) | mode={mode} | {len(rows)} clauses | {len(accs)} folds | zero-shot",
+        lines = [f"{args.name} ({args.backend} {args.model}, prompt {args.prompt}) | mode={mode} | {len(rows)} clauses | {len(accs)} folds | zero-shot",
                  f"accuracy : {np.mean(accs):.3f} +/- {np.std(accs):.3f}",
                  f"macro-F1 : {np.mean(macros):.3f} +/- {np.std(macros):.3f}",
                  f"unparseable answers (scored as none): {n_unparsed}; predicted classes absent from data: {off_taxonomy or 'none'}",
