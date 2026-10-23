@@ -1,0 +1,10 @@
+zeroshot_qwen7b_p3 (hf Qwen/Qwen2.5-7B-Instruct, prompt v3) | mode=grouped | v3 labels | 251 clauses | 15 folds | zero-shot
+accuracy : 0.744 +/- 0.077
+macro-F1 : 0.619 +/- 0.123
+unparseable answers (scored as none): 0; predicted classes absent from data: none
+per-class F1 (mean +/- std over folds where the class appears):
+  deceptive_framing    0.644 +/- 0.205  (n_folds=15)
+  forced_arbitration   0.727 +/- 0.380  (n_folds=10)
+  hidden_fee           0.518 +/- 0.167  (n_folds=10)
+  none                 0.800 +/- 0.082  (n_folds=15)
+  penalty_obscurity    0.242 +/- 0.404  (n_folds=11)
