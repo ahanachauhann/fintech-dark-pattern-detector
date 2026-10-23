@@ -8,6 +8,7 @@ Usage:
     python src/train_classifier.py
 """
 import csv
+import os
 import pickle
 from pathlib import Path
 
@@ -16,7 +17,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.metrics import classification_report
 
-DATA_PATH = Path(__file__).resolve().parent.parent / "data" / "labeled" / "clauses_reviewed.csv"
+# Default = hand-verified v3 labels. Use DP_LABELS=clauses_reviewed.csv to train on the original (v2) labels.
+DATA_PATH = Path(__file__).resolve().parent.parent / "data" / "labeled" / os.environ.get("DP_LABELS", "clauses_reviewed_v3.csv")
 MODEL_OUT = Path(__file__).resolve().parent.parent / "data" / "labeled" / "classifier.pkl"
 
 
