@@ -1,0 +1,20 @@
+Fairness Score validation | labels: clauses_reviewed_v3.csv | 13 documents
+
+document                         true_score  predicted_score
+bnpl_amazonpaylater.txt              58.8        64.7
+bnpl_lazypay.txt                     88.9        88.9
+bnpl_paytm_fees.txt                  52.2        83.7
+bnpl_zestmoney.txt                   90.0        86.7
+card_au_bank_mitc.txt                75.0        79.5
+card_hdfc_mitc.txt                   81.2        74.1
+card_icici_mitc.txt                  75.7        83.8
+card_idfc_mitc.txt                   70.0        67.5
+insurance_bajaj_general.txt         100.0        96.4
+insurance_hdfc_ergo.txt             100.0       100.0
+loan_fibe.txt                        88.1        88.1
+loan_flipkart_emi.txt                93.5        92.4
+loan_kreditbee.txt                  100.0       100.0
+
+Spearman rank correlation, hand-label score vs unseen-document model score: 0.90 (p=0.000)
+Mean absolute gap: 5.2 points
+Ranking agreement, current weights vs all-equal weights: Spearman 0.98
