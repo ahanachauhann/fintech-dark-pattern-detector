@@ -15,12 +15,13 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 
 import fairness_score as fs
-from cv_splits import ROOT
+from cv_splits import EXCLUDE_DOCS, ROOT, TAG
 
 
 def main():
     path = ROOT / "data" / "labeled" / os.environ.get("DP_LABELS", "clauses_reviewed_v3.csv")
     rows = [r for r in csv.DictReader(open(path, encoding="utf-8")) if r["label"]]
+    rows = [r for r in rows if r["source_file"] not in EXCLUDE_DOCS]   # DP_EXCLUDE robustness check
     texts = [r["clause_text"] for r in rows]
     y = np.array([r["label"] for r in rows])
     g = np.array([r["source_file"] for r in rows])
@@ -57,7 +58,7 @@ def main():
     report = "\n".join(lines)
     print(report)
     (ROOT / "results").mkdir(exist_ok=True)
-    (ROOT / "results" / "fairness_validation.txt").write_text(report + "\n")
+    (ROOT / "results" / f"fairness_validation{TAG}.txt").write_text(report + "\n")
 
 
 if __name__ == "__main__":

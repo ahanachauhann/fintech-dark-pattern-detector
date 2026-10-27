@@ -1,0 +1,16 @@
+file,document,type,source_url,date_verified,search_sentence,notes
+bnpl_amazonpaylater.txt,Amazon Pay Later - Terms & Conditions (axio facility),BNPL,https://www.axio.co.in/terms-conditions,,the Disbursement of the Loan Amount shall be at the sole and absolute discretion of the Bank,URL located 2026-10-25 by web search (T&C hosted by axio). Confirm the text matches your copy.
+bnpl_lazypay.txt,LazyPay terms,BNPL,,,The LazyPay User availing the LazyPay Services shall be entitled to make payment of the purchase price,
+bnpl_paytm_fees.txt,Paytm fees / platform fee terms,BNPL,,,Paytm reserves the right to charge a nominal Platform Fee,
+bnpl_zestmoney.txt,ZestMoney terms,BNPL,,,The failure of ZestMoney to exercise or enforce any right or provision of the Terms,
+card_au_bank_mitc.txt,AU Small Finance Bank credit card MITC,Credit card,,,"Late payment charges are 15% of Total Amount Due, with a Minimum of Rs. 10 and Maximum of Rs. 1300",
+card_hdfc_mitc.txt,HDFC Bank credit card MITC,Credit card,,,Over limit charges are applicable on total outstanding exceeding the Credit Limit at the rate of 2.5%,
+card_icici_mitc.txt,ICICI Bank credit card MITC,Credit card,,,Over-limit charges: 2.50% on the over-limit amount,
+card_idfc_mitc.txt,IDFC FIRST Bank credit card MITC,Credit card,,,Interest will be charged at up to 3% per month (36.00% annualized),
+insurance_bajaj_general.txt,Bajaj General policy wording,Insurance,,,No refund of Premium shall be due on cancellation of Policy if a claim has been made by You,
+insurance_hdfc_ergo.txt,HDFC ERGO policy wording,Insurance,,,This Policy will automatically terminate at the end of the Policy Period,
+loan_fibe.txt,Fibe terms,Loan,,,"Deletion, uninstallation, discontinuation of our Services, shall not release you from the responsibility",
+loan_flipkart_emi.txt,Flipkart EMI / Advanz terms and FAQ,Loan,,,Processing fee with effect from 15th Nov '24,
+loan_kreditbee.txt,KreditBee terms,Loan,,,"the Borrower is obligated to repay the Loan, including interest, fees, and other charges",
+loan_rbi_kfs_format.txt,Reference text: RBI Key Facts Statement requirements (condensed),Reference text,,,,"NOT a verbatim public document. Primary source: RBI circular RBI/2024-25/18, 15 Apr 2024. Record who produced this text."
+loan_fees_charges_policy.txt,Reference text: lender fee policy (condensed),Reference text,,,,"NOT a verbatim public document. Related primary source: RBI circular RBI/2023-24/53, 18 Aug 2023 (penal charges). Record who produced this text."

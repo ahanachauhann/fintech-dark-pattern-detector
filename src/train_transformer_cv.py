@@ -30,7 +30,7 @@ from torch.utils.data import Dataset
 from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
                           Trainer, TrainingArguments, set_seed)
 
-from cv_splits import ROOT, SPLITS_PATH, TAG, load_rows
+from cv_splits import ROOT, SPLITS_PATH, TAG, apply_exclusion, load_rows
 
 MODEL_CHOICES = {
     "distilbert": "distilbert-base-uncased",
@@ -82,6 +82,7 @@ def main():
         splits = splits[: args.max_folds]
 
     rows = load_rows()
+    splits = apply_exclusion(splits, rows)
     texts = [r["clause_text"] for r in rows]
     labels_all = sorted({r["label"] for r in rows})
     l2i = {l: i for i, l in enumerate(labels_all)}

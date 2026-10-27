@@ -24,6 +24,8 @@ ROOT = Path(__file__).resolve().parent.parent
 #   DP_LABELS=clauses_reviewed_v3.csv DP_TAG=_v3 python ...
 DATA_PATH = ROOT / "data" / "labeled" / os.environ.get("DP_LABELS", "clauses_reviewed.csv")
 TAG = os.environ.get("DP_TAG", "")   # suffix added to result file names
+# Robustness check: DP_EXCLUDE=loan_rbi_kfs_format.txt,loan_fees_charges_policy.txt drops those documents everywhere
+EXCLUDE_DOCS = {d.strip() for d in os.environ.get("DP_EXCLUDE", "").split(",") if d.strip()}
 SPLITS_PATH = ROOT / "results" / "cv_splits.json"
 
 
@@ -58,7 +60,7 @@ def save_splits(splits, mode):
     SPLITS_PATH.write_text(json.dumps(existing))
 
 
-def get_splits(rows, mode="stratified"):
+def _get_splits_raw(rows, mode="stratified"):
     """Load saved folds if present (so every method reuses them), else create and save."""
     if SPLITS_PATH.exists():
         saved = json.loads(SPLITS_PATH.read_text())
@@ -67,3 +69,15 @@ def get_splits(rows, mode="stratified"):
     splits = make_splits(rows, mode)
     save_splits(splits, mode)
     return splits
+
+
+def apply_exclusion(splits, rows):
+    """Remove rows of excluded documents from every fold (the frozen folds themselves are not regenerated)."""
+    if not EXCLUDE_DOCS:
+        return splits
+    ex = {i for i, r in enumerate(rows) if r.get("source_file") in EXCLUDE_DOCS}
+    return [([i for i in tr if i not in ex], [i for i in te if i not in ex]) for tr, te in splits]
+
+
+def get_splits(rows, mode="stratified"):
+    return apply_exclusion(_get_splits_raw(rows, mode), rows)

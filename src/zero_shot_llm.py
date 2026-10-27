@@ -32,7 +32,7 @@ import numpy as np
 from sklearn.metrics import accuracy_score, f1_score
 
 from categories import CATEGORIES, CATEGORY_IDS
-from cv_splits import ROOT, SPLITS_PATH, TAG, load_rows
+from cv_splits import ROOT, SPLITS_PATH, TAG, apply_exclusion, load_rows
 
 SYSTEM = (
     "You are an expert analyst of consumer financial contracts. You classify one clause "
@@ -179,7 +179,7 @@ def main():
     for mode in ("stratified", "grouped"):
         accs, macros = [], []
         per_class = defaultdict(list)
-        for _, te in splits_all[mode]:
+        for _, te in apply_exclusion(splits_all[mode], rows):
             te = np.array(te)
             accs.append(accuracy_score(y[te], pred[te]))
             macros.append(f1_score(y[te], pred[te], labels=sorted(set(y[te])), average="macro", zero_division=0))
